@@ -24,7 +24,8 @@ No need for any other dependencies as they are included in the library. Find the
 To get started, you first need to create a new `JQLite` instance.
 
 ```java
-private final DatabaseEngine engine = new DatabaseEngine("testdb"); // Replace testdb with your database name
+// Replace testdb with your database name
+private final DatabaseEngine engine = new DatabaseEngine("testdb");
 ```
 
 Next, you need to create a "Table Class".
@@ -32,8 +33,10 @@ Next, you need to create a "Table Class".
 ```java
 public class MyTableName extends SQLiteTable {
 
+    // This is the primary, autoincrementing key; 
+    // THIS MUST ALWAYS BE AT THE TOP ABOVE EVERYTHING ELSE!!!
     @SQLCOLUMN(type = SQLCOLUMN.Type.PRIMARY)
-    private int id; // This is the primary, autoincrementing key; THIS MUST ALWAYS BE AT THE TOP ABOVE ANYTHING ELSE!!!
+    private int id;
 
     @SQLCOLUMN(type = SQLCOLUMN.Type.VARCHAR, maxSize = 255)
     private String name; // A basic VARCHAR column limited to 255 characters
@@ -64,8 +67,7 @@ public class MyTableName extends SQLiteTable {
 }
 ```
 
-Then you need to register the Table to the Database engine
-```engine.registerTable(myTableName);```
+Then you need to register the Table to the Database engine using ```engine.registerTable(myTableName);```
 
 Each class extending `SQLiteTable` comes with the following methods:
 
@@ -81,8 +83,8 @@ Basic insert example
 
 ```java
 MyTableName myTable = new MyTableName();
-engine.registerTable(myTable); // This only need to be done once!
-myTable.setName('John Doe');
+engine.registerTable(myTable); // This only needs to be done once!
+myTable.setName("John Doe");
 myTable.setRegistered(true);
 
 myTable.insert();
@@ -92,7 +94,7 @@ Basic update example
 
 ```java
 MyTableName myTable = new MyTableName();
-myTable.fetch("name = 'John Doe");
+myTable.fetch("name = 'John Doe'");
 myTable.setRegistered(false);
 
 myTable.update();
@@ -102,12 +104,12 @@ Basic delete example
 
 ```java
 MyTableName myTable = new MyTableName();
-myTable.fetch("name = 'John Doe");
+myTable.fetch("name = 'John Doe'");
 
 myTable.delete();
 ```
 
-Basic fetchall example
+Basic fetchAll example
 
 ```java
 MyTableName myTable = new MyTableName();
@@ -118,7 +120,7 @@ for (MyTableName myTable1 : tableList) {
 }
 ```
 
-Basic fetchall with filter example
+Basic fetchAll with filter example
 
 ```java
 MyTableName myTable = new MyTableName();
