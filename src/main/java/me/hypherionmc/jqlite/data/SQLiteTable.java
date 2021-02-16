@@ -305,7 +305,7 @@ public class SQLiteTable {
             ResultSet rs = statement.executeQuery(sql);
 
             if (rs.next()) {
-                Object obj = this.getClass().newInstance();
+                //Object obj = this.getClass().newInstance();
                 for (Field field : fields) {
                     field.setAccessible(true);
 
@@ -319,37 +319,37 @@ public class SQLiteTable {
                             case TINYINT:
                             case SMALLINT:
                             case NUMERIC:
-                                FieldUtils.writeField(field, obj, rs.getInt(field.getName()));
+                                FieldUtils.writeField(field, this, rs.getInt(field.getName()));
                                 break;
 
                             case MEDIUMINT:
                             case BIGINT:
-                                FieldUtils.writeField(field, obj, rs.getLong(field.getName()));
+                                FieldUtils.writeField(field, this, rs.getLong(field.getName()));
                                 break;
 
                             case DECIMAL:
                             case DOUBLE:
                             case REAL:
-                                FieldUtils.writeField(field, obj, rs.getDouble(field.getName()));
+                                FieldUtils.writeField(field, this, rs.getDouble(field.getName()));
                                 break;
 
                             case FLOAT:
-                                FieldUtils.writeField(field, obj, rs.getFloat(field.getName()));
+                                FieldUtils.writeField(field, this, rs.getFloat(field.getName()));
                                 break;
 
                             case VARCHAR:
                             case NVARCHAR:
                             case TEXT:
-                                FieldUtils.writeField(field, obj, rs.getString(field.getName()));
+                                FieldUtils.writeField(field, this, rs.getString(field.getName()));
                                 break;
 
                             case BOOLEAN:
-                                FieldUtils.writeField(field, obj, rs.getBoolean(field.getName()));
+                                FieldUtils.writeField(field, this, rs.getBoolean(field.getName()));
                                 break;
 
                             case DATE:
                             case DATETIME:
-                                FieldUtils.writeField(field, obj, rs.getDate(field.getName()));
+                                FieldUtils.writeField(field, this, rs.getDate(field.getName()));
                                 break;
 
                             /*case NCHAR:
