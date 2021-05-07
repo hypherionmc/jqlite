@@ -2,6 +2,7 @@ package me.hypherionmc.jqlite.data;
 
 import me.hypherionmc.jqlite.DatabaseEngine;
 import me.hypherionmc.jqlite.annotations.*;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Field;
@@ -90,8 +91,10 @@ public class SQLiteTable {
 
                     if (fields[i].isAnnotationPresent(SQLCOLUMN.class) && fields[i].getAnnotation(SQLCOLUMN.class).type() == SQLCOLUMN.Type.BOOLEAN) {
                         values.append("'").append(Boolean.parseBoolean(FieldUtils.readField(fields[i], this).toString()) ? 1 : 0).append("'");
+                    } else if (fields[i].isAnnotationPresent(SQLCOLUMN.class) && (fields[i].getAnnotation(SQLCOLUMN.class).type() == SQLCOLUMN.Type.TEXT || fields[i].getAnnotation(SQLCOLUMN.class).type() == SQLCOLUMN.Type.VARCHAR || fields[i].getAnnotation(SQLCOLUMN.class).type() == SQLCOLUMN.Type.NVARCHAR)) {
+                        values.append(fields[i].getName().toLowerCase()).append(" = ").append("'").append(StringEscapeUtils.escapeEcmaScript(FieldUtils.readField(fields[i], this).toString())).append("'");
                     } else {
-                        values.append("'").append(FieldUtils.readField(fields[i], this)).append("'");
+                        values.append(fields[i].getName().toLowerCase()).append(" = ").append("'").append(FieldUtils.readField(fields[i], this)).append("'");
                     }
 
                     if (i < (fields.length - 1)) {
@@ -149,6 +152,8 @@ public class SQLiteTable {
 
                     if (fields[i].isAnnotationPresent(SQLCOLUMN.class) && fields[i].getAnnotation(SQLCOLUMN.class).type() == SQLCOLUMN.Type.BOOLEAN) {
                         values.append(fields[i].getName().toLowerCase()).append(" = ").append("'").append(Boolean.parseBoolean(FieldUtils.readField(fields[i], this).toString()) ? 1 : 0).append("'");
+                    } else if (fields[i].isAnnotationPresent(SQLCOLUMN.class) && (fields[i].getAnnotation(SQLCOLUMN.class).type() == SQLCOLUMN.Type.TEXT || fields[i].getAnnotation(SQLCOLUMN.class).type() == SQLCOLUMN.Type.VARCHAR || fields[i].getAnnotation(SQLCOLUMN.class).type() == SQLCOLUMN.Type.NVARCHAR)) {
+                        values.append(fields[i].getName().toLowerCase()).append(" = ").append("'").append(StringEscapeUtils.escapeEcmaScript(FieldUtils.readField(fields[i], this).toString())).append("'");
                     } else {
                         values.append(fields[i].getName().toLowerCase()).append(" = ").append("'").append(FieldUtils.readField(fields[i], this)).append("'");
                     }
@@ -243,7 +248,7 @@ public class SQLiteTable {
                             case VARCHAR:
                             case NVARCHAR:
                             case TEXT:
-                                FieldUtils.writeField(field, obj, rs.getString(field.getName()));
+                                FieldUtils.writeField(field, obj, StringEscapeUtils.unescapeEcmaScript(rs.getString(field.getName())));
                                 break;
 
                             case BOOLEAN:
@@ -340,7 +345,7 @@ public class SQLiteTable {
                             case VARCHAR:
                             case NVARCHAR:
                             case TEXT:
-                                FieldUtils.writeField(field, this, rs.getString(field.getName()));
+                                FieldUtils.writeField(field, this, StringEscapeUtils.unescapeEcmaScript(rs.getString(field.getName())));
                                 break;
 
                             case BOOLEAN:
