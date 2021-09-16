@@ -16,7 +16,7 @@ public class DatabaseEngine {
     private Connection connection;
     private String dbName;
     public static final Logger LOGGER = Logger.getLogger("JQLite");
-    private static String DBCONNECTION;
+    private final String DBCONNECTION;
 
     /***
      * Create a new JQLite instance
@@ -59,7 +59,7 @@ public class DatabaseEngine {
      * Get a connection to the database
      * @return
      */
-    public static Connection getConnection() {
+    public Connection getConnection() {
         try {
             return DriverManager.getConnection(DBCONNECTION);
         } catch (SQLException e) {
@@ -70,14 +70,16 @@ public class DatabaseEngine {
 
     /***
      * Register a class extending {SQLiteTable} on the JQLite engine
-     * @param table - The class extending SQLiteTable
+     * @param tables - A list of or single class extending SQLiteTable
      */
-    public void registerTable(SQLiteTable table) {
-        try {
-            table.create(getConnection());
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.log(Level.SEVERE, "Failed to register table " + table.getClass().getName());
+    public void registerTable(SQLiteTable... tables) {
+        for (SQLiteTable table : tables) {
+            try {
+                table.create(this);
+            } catch (Exception e) {
+                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Failed to register table " + table.getClass().getName());
+            }
         }
     }
 
