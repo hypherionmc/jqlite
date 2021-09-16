@@ -1,8 +1,7 @@
 package me.hypherionmc.jqlite.data;
 
 import me.hypherionmc.jqlite.DatabaseEngine;
-import me.hypherionmc.jqlite.annotations.*;
-import org.apache.commons.lang3.StringEscapeUtils;
+import me.hypherionmc.jqlite.annotations.SQLCOLUMN;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Field;
@@ -15,13 +14,18 @@ import java.util.logging.Level;
 
 public class SQLiteTable {
 
+    private DatabaseEngine _engineInstance;
+
     /***
      * Called to create a new table in the SqlLite Database. Called when you call @link {DatabaseEngine.registerTable}
-     * @param connection - The connection to the database
+     * @param engine - An instance of the database engine
      * @throws Exception - Thrown when something went wrong
      */
     @Deprecated
-    public void create(Connection connection) throws Exception {
+    public void create(DatabaseEngine engine) throws Exception {
+        _engineInstance = engine;
+        Connection connection = _engineInstance.getConnection();
+
         StringBuilder sql = new StringBuilder();
         Field[] fields = this.getClass().getDeclaredFields();
 
@@ -112,7 +116,7 @@ public class SQLiteTable {
         sql.append(" ").append(columns.toString()).append(" VALUES ").append(values.toString());
 
         try {
-            Connection connection = DatabaseEngine.getConnection();
+            Connection connection = _engineInstance.getConnection();
             final Statement statement = connection.createStatement();
 
             if (!statement.execute(sql.toString())) {
@@ -172,7 +176,7 @@ public class SQLiteTable {
             fields[0].setAccessible(true);
             sql.append(values.toString()).append(" WHERE ").append(fields[0].getName().toLowerCase()).append(" = '").append(FieldUtils.readField(fields[0], this)).append("'");
 
-            Connection connection = DatabaseEngine.getConnection();
+            Connection connection = _engineInstance.getConnection();
             final Statement statement = connection.createStatement();
 
             if (!statement.execute(sql.toString())) {
@@ -204,7 +208,7 @@ public class SQLiteTable {
         List<T> tables = new ArrayList<>();
 
         try {
-            Connection connection = DatabaseEngine.getConnection();
+            Connection connection = _engineInstance.getConnection();
             final Statement statement = connection.createStatement();
 
             String sql = "SELECT * FROM " + this.getClass().getSimpleName() + (!whereClause.isEmpty() ? " WHERE " + whereClause : "");
@@ -302,7 +306,7 @@ public class SQLiteTable {
         Field[] fields = this.getClass().getDeclaredFields();
 
         try {
-            Connection connection = DatabaseEngine.getConnection();
+            Connection connection = _engineInstance.getConnection();
             final Statement statement = connection.createStatement();
 
             String sql = "SELECT * FROM " + this.getClass().getSimpleName() + " WHERE " + whereClause;
@@ -385,7 +389,7 @@ public class SQLiteTable {
         boolean res = false;
 
         try {
-            Connection connection = DatabaseEngine.getConnection();
+            Connection connection = _engineInstance.getConnection();
             final Statement statement = connection.createStatement();
 
             for (Field field : fields) {
@@ -401,5 +405,28 @@ public class SQLiteTable {
         }
 
         return !res;
+    }
+
+    /***
+     * A wrapper around fetchAll and insert, to determine if a value already exists in the DB before inserting
+     * @param filter - The columns to perform the check against
+     * @return - True on success, false when entry already exists
+     */
+    public boolean insertUnique(String filter) {
+        List<SQLiteTable> results = this.fetchAll(filter);
+        if (results.isEmpty()) {
+            return this.insert();
+        }
+        return false;
+    }
+
+    public boolean insertOrUpdate(String filter) {
+        List<SQLiteTable> results = this.fetchAll(filter);
+        if (results.isEmpty()) {
+            return this.insert();
+        } else {
+            results.forEach(SQLiteTable::update);
+            return true;
+        }
     }
 }
