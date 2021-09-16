@@ -15,7 +15,7 @@ Add the following to the repositories block of your `build.gradle` file:
 Then add the following to dependencies:
 
 ```gradle
-compile 'me.hypherionmc:JQLite:1.0.4'
+compile 'me.hypherionmc:JQLite:1.0.5'
 ```
 No need for any other dependencies as they are included in the library. Find the latest versions [HERE](https://maven.hypherionmc.me/me/hypherionmc/JQLite/)
 
@@ -76,6 +76,8 @@ Each class extending `SQLiteTable` comes with the following methods:
 * fetchAll
 * fetch
 * delete
+* insertUnique
+* insertOrUpdate
 
 #### Examples
 
