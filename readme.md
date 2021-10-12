@@ -10,12 +10,12 @@ To use this library, you first need to add it.
 
 Add the following to the repositories block of your `build.gradle` file:
 
-```maven { url 'https://maven.hypherionmc.me' }```
+```maven { url 'https://maven.hypherionmc.me/releases' }```
 
 Then add the following to dependencies:
 
 ```gradle
-compile 'me.hypherionmc:JQLite:1.0.5'
+compile 'me.hypherionmc:JQLite:1.0.6'
 ```
 No need for any other dependencies as they are included in the library. Find the latest versions [HERE](https://maven.hypherionmc.me/me/hypherionmc/JQLite/)
 

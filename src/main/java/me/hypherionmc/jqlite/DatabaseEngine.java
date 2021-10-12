@@ -13,8 +13,6 @@ import java.util.logging.Logger;
 
 public class DatabaseEngine {
 
-    private Connection connection;
-    private String dbName;
     public static final Logger LOGGER = Logger.getLogger("JQLite");
     private final String DBCONNECTION;
 

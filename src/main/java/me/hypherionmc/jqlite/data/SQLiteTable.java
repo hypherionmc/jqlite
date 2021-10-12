@@ -16,6 +16,10 @@ public class SQLiteTable {
 
     private DatabaseEngine _engineInstance;
 
+    public SQLiteTable(DatabaseEngine databaseEngine) {
+        this._engineInstance = databaseEngine;
+    }
+
     /***
      * Called to create a new table in the SqlLite Database. Called when you call @link {DatabaseEngine.registerTable}
      * @param engine - An instance of the database engine
@@ -138,19 +142,14 @@ public class SQLiteTable {
      * @return - True on success, false on failure
      */
     public boolean update() {
-       // StringBuilder columns = new StringBuilder();
         StringBuilder values = new StringBuilder();
         StringBuilder sql = new StringBuilder();
 
         Field[] fields = this.getClass().getDeclaredFields();
-
-        //columns.append("(");
-        //values.append("(");
         sql.append("UPDATE ").append(this.getClass().getSimpleName()).append(" SET ");
 
         for (int i = 0; i < fields.length; i++) {
             if (fields[i].isAnnotationPresent(SQLCOLUMN.class) && fields[i].getAnnotation(SQLCOLUMN.class).type() != SQLCOLUMN.Type.PRIMARY) {
-                //columns.append(fields[i].getName().toLowerCase());
                 try {
                     fields[i].setAccessible(true);
 
@@ -163,7 +162,6 @@ public class SQLiteTable {
                     }
 
                     if (i < (fields.length - 1)) {
-                        //columns.append(", ");
                         values.append(", ");
                     }
                 } catch (Exception ex) {
