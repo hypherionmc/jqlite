@@ -10,14 +10,14 @@ To use this library, you first need to add it.
 
 Add the following to the repositories block of your `build.gradle` file:
 
-```maven { url 'https://maven.hypherionmc.me/releases' }```
+```maven { url 'https://maven.firstdarkdev.xyz/releases' }```
 
 Then add the following to dependencies:
 
 ```gradle
-compile 'me.hypherionmc:JQLite:1.0.6'
+compile 'me.hypherionmc:JQLite:1.0.8'
 ```
-No need for any other dependencies as they are included in the library. Find the latest versions [HERE](https://maven.hypherionmc.me/me/hypherionmc/JQLite/)
+No need for any other dependencies as they are included in the library. Find the latest versions [HERE](https://maven.firstdarkdev.xyz/#/releases/me/hypherionmc/JQLite)
 
 #### Getting Started
 
@@ -133,4 +133,4 @@ for (MyTableName myTable1 : tableList) {
 }
 ```
 
-If you need help with this library, please join my [discord](https://discord.gg/PdVnXf9) or open an Issue above
+If you need help with this library, please join my [discord](https://discord.firstdarkdev.xyz) or open an Issue above
