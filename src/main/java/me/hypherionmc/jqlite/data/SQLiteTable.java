@@ -14,21 +14,13 @@ import java.util.logging.Level;
 
 public class SQLiteTable {
 
-    private DatabaseEngine _engineInstance;
-
-    public SQLiteTable(DatabaseEngine databaseEngine) {
-        this._engineInstance = databaseEngine;
-    }
-
     /***
      * Called to create a new table in the SqlLite Database. Called when you call @link {DatabaseEngine.registerTable}
-     * @param engine - An instance of the database engine
      * @throws Exception - Thrown when something went wrong
      */
     @Deprecated
-    public void create(DatabaseEngine engine) throws Exception {
-        _engineInstance = engine;
-        Connection connection = _engineInstance.getConnection();
+    public void create() throws Exception {
+        Connection connection = DatabaseEngine.getConnection(this);
 
         StringBuilder sql = new StringBuilder();
         Field[] fields = this.getClass().getDeclaredFields();
@@ -81,6 +73,8 @@ public class SQLiteTable {
      * @return - True on success and false on failure
      */
     public boolean insert() {
+        Connection connection = DatabaseEngine.getConnection(this);
+
         StringBuilder columns = new StringBuilder();
         StringBuilder values = new StringBuilder();
         StringBuilder sql = new StringBuilder();
@@ -93,7 +87,7 @@ public class SQLiteTable {
 
         for (int i = 0; i < fields.length; i++) {
             if (fields[i].isAnnotationPresent(SQLCOLUMN.class) && fields[i].getAnnotation(SQLCOLUMN.class).type() != SQLCOLUMN.Type.PRIMARY) {
-                columns.append(fields[i].getName().toLowerCase());
+                columns.append("'").append(fields[i].getName().toLowerCase()).append("'");
                 try {
                     fields[i].setAccessible(true);
 
@@ -120,7 +114,6 @@ public class SQLiteTable {
         sql.append(" ").append(columns.toString()).append(" VALUES ").append(values.toString());
 
         try {
-            Connection connection = _engineInstance.getConnection();
             final Statement statement = connection.createStatement();
 
             if (!statement.execute(sql.toString())) {
@@ -142,6 +135,8 @@ public class SQLiteTable {
      * @return - True on success, false on failure
      */
     public boolean update() {
+        Connection connection = DatabaseEngine.getConnection(this);
+
         StringBuilder values = new StringBuilder();
         StringBuilder sql = new StringBuilder();
 
@@ -154,11 +149,11 @@ public class SQLiteTable {
                     fields[i].setAccessible(true);
 
                     if (fields[i].isAnnotationPresent(SQLCOLUMN.class) && fields[i].getAnnotation(SQLCOLUMN.class).type() == SQLCOLUMN.Type.BOOLEAN) {
-                        values.append(fields[i].getName().toLowerCase()).append(" = ").append("'").append(Boolean.parseBoolean(FieldUtils.readField(fields[i], this).toString()) ? 1 : 0).append("'");
+                        values.append("'").append(fields[i].getName().toLowerCase()).append("'").append(" = ").append("'").append(Boolean.parseBoolean(FieldUtils.readField(fields[i], this).toString()) ? 1 : 0).append("'");
                     } else if (fields[i].isAnnotationPresent(SQLCOLUMN.class) && (fields[i].getAnnotation(SQLCOLUMN.class).type() == SQLCOLUMN.Type.TEXT || fields[i].getAnnotation(SQLCOLUMN.class).type() == SQLCOLUMN.Type.VARCHAR || fields[i].getAnnotation(SQLCOLUMN.class).type() == SQLCOLUMN.Type.NVARCHAR)) {
-                        values.append(fields[i].getName().toLowerCase()).append(" = ").append("'").append(FieldUtils.readField(fields[i], this).toString().replaceAll("'", "''")).append("'");
+                        values.append("'").append(fields[i].getName().toLowerCase()).append("'").append(" = ").append("'").append(FieldUtils.readField(fields[i], this).toString().replaceAll("'", "''")).append("'");
                     } else {
-                        values.append(fields[i].getName().toLowerCase()).append(" = ").append("'").append(FieldUtils.readField(fields[i], this)).append("'");
+                        values.append("'").append(fields[i].getName().toLowerCase()).append("'").append(" = ").append("'").append(FieldUtils.readField(fields[i], this)).append("'");
                     }
 
                     if (i < (fields.length - 1)) {
@@ -174,7 +169,6 @@ public class SQLiteTable {
             fields[0].setAccessible(true);
             sql.append(values.toString()).append(" WHERE ").append(fields[0].getName().toLowerCase()).append(" = '").append(FieldUtils.readField(fields[0], this)).append("'");
 
-            Connection connection = _engineInstance.getConnection();
             final Statement statement = connection.createStatement();
 
             if (!statement.execute(sql.toString())) {
@@ -201,12 +195,12 @@ public class SQLiteTable {
      * @return
      */
     public <T extends SQLiteTable> List<T> fetchAll(String whereClause)  {
-
+        Connection connection = DatabaseEngine.getConnection(this);
         Field[] fields = this.getClass().getDeclaredFields();
         List<T> tables = new ArrayList<>();
 
         try {
-            Connection connection = _engineInstance.getConnection();
+
             final Statement statement = connection.createStatement();
 
             String sql = "SELECT * FROM " + this.getClass().getSimpleName() + (!whereClause.isEmpty() ? " WHERE " + whereClause : "");
@@ -300,11 +294,10 @@ public class SQLiteTable {
      * @param whereClause - The data to search against. Example: id = 1 or name = John Doe
      */
     public void fetch(String whereClause) {
-
+        Connection connection = DatabaseEngine.getConnection(this);
         Field[] fields = this.getClass().getDeclaredFields();
 
         try {
-            Connection connection = _engineInstance.getConnection();
             final Statement statement = connection.createStatement();
 
             String sql = "SELECT * FROM " + this.getClass().getSimpleName() + " WHERE " + whereClause;
@@ -317,7 +310,6 @@ public class SQLiteTable {
                     field.setAccessible(true);
 
                     if (field.isAnnotationPresent(SQLCOLUMN.class)) {
-
                         switch (field.getAnnotation(SQLCOLUMN.class).type()) {
 
                             case PRIMARY:
@@ -382,12 +374,12 @@ public class SQLiteTable {
      * @return
      */
     public boolean delete() {
+        Connection connection = DatabaseEngine.getConnection(this);
         Field[] fields = this.getClass().getDeclaredFields();
         StringBuilder sql = new StringBuilder("DELETE FROM " + this.getClass().getSimpleName() + " WHERE id = ");
         boolean res = false;
 
         try {
-            Connection connection = _engineInstance.getConnection();
             final Statement statement = connection.createStatement();
 
             for (Field field : fields) {
