@@ -16,7 +16,7 @@ public class DatabaseEngine {
 
     public static final Logger LOGGER = Logger.getLogger("JQLite");
 
-    private static final HashMap<SQLiteTable, String> connectionMappings = new HashMap<>();
+    private static final HashMap<String, String> connectionMappings = new HashMap<>();
 
     private final String DBCONNECTION;
 
@@ -61,12 +61,12 @@ public class DatabaseEngine {
      * @return
      */
     public static Connection getConnection(SQLiteTable table) {
-        if (!connectionMappings.containsKey(table)) {
+        if (!connectionMappings.containsKey(table.getClass().getName())) {
             LOGGER.log(Level.SEVERE, "Fatal: Cannot find connection mapping for :" + table.getClass());
             return null;
         }
         try {
-            return DriverManager.getConnection(connectionMappings.get(table));
+            return DriverManager.getConnection(connectionMappings.get(table.getClass().getName()));
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage());
         }
@@ -88,7 +88,7 @@ public class DatabaseEngine {
      */
     public void registerTable(SQLiteTable... tables) {
         for (SQLiteTable table : tables) {
-            connectionMappings.putIfAbsent(table, DBCONNECTION);
+            connectionMappings.putIfAbsent(table.getClass().getName(), DBCONNECTION);
             try {
                 table.create();
             } catch (Exception e) {
