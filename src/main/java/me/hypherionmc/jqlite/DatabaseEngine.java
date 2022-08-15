@@ -13,10 +13,8 @@ import java.util.logging.Logger;
 
 public class DatabaseEngine {
 
-    private Connection connection;
-    private String dbName;
     public static final Logger LOGGER = Logger.getLogger("JQLite");
-    private static String DBCONNECTION;
+    private final String DBCONNECTION;
 
     /***
      * Create a new JQLite instance
@@ -41,7 +39,6 @@ public class DatabaseEngine {
     }
 
     private void createNewDatabase() {
-
         try (Connection conn = DriverManager.getConnection(DBCONNECTION)) {
             if (conn != null) {
                 DatabaseMetaData meta = conn.getMetaData();
@@ -49,17 +46,16 @@ public class DatabaseEngine {
                 LOGGER.info("A new database has been created.");
                 conn.close();
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage());
         }
     }
 
     /***
-     * Get a connection to the database
-     * @return
+     * Get a connection to the database - INTERNAL USAGE
+     * @return - An instance of the connection
      */
-    public static Connection getConnection() {
+    public Connection getConnection() {
         try {
             return DriverManager.getConnection(DBCONNECTION);
         } catch (SQLException e) {
@@ -70,15 +66,16 @@ public class DatabaseEngine {
 
     /***
      * Register a class extending {SQLiteTable} on the JQLite engine
-     * @param table - The class extending SQLiteTable
+     * @param tables - List of or Single Table to register
      */
-    public void registerTable(SQLiteTable table) {
-        try {
-            table.create(getConnection());
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.log(Level.SEVERE, "Failed to register table " + table.getClass().getName());
+    public void registerTable(SQLiteTable... tables) {
+        for (SQLiteTable table : tables) {
+            try {
+                table.create(this);
+            } catch (Exception e) {
+                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Failed to register table " + table.getClass().getName());
+            }
         }
     }
-
 }

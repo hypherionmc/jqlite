@@ -17,11 +17,9 @@ public class SQLiteTable {
 
     /***
      * Called to create a new table in the SqlLite Database. Called when you call @link {DatabaseEngine.registerTable}
-     * @param connection - The connection to the database
      * @throws Exception - Thrown when something went wrong
      */
-    @Deprecated
-    public void create(Connection connection) throws Exception {
+    public void create(DatabaseEngine engine) throws Exception {
         StringBuilder sql = new StringBuilder();
         Field[] fields = this.getClass().getDeclaredFields();
 
@@ -54,6 +52,7 @@ public class SQLiteTable {
         sql.append(");");
 
         try {
+            Connection connection = engine.getConnection();
             final Statement statement = connection.createStatement();
 
             if (!statement.execute(sql.toString())) {
@@ -72,7 +71,7 @@ public class SQLiteTable {
      * Used to insert the values of the table into the SqlLite table
      * @return - True on success and false on failure
      */
-    public boolean insert() {
+    public boolean insert(DatabaseEngine engine) {
         StringBuilder columns = new StringBuilder();
         StringBuilder values = new StringBuilder();
         StringBuilder sql = new StringBuilder();
@@ -112,7 +111,7 @@ public class SQLiteTable {
         sql.append(" ").append(columns.toString()).append(" VALUES ").append(values.toString());
 
         try {
-            Connection connection = DatabaseEngine.getConnection();
+            Connection connection = engine.getConnection();
             final Statement statement = connection.createStatement();
 
             if (!statement.execute(sql.toString())) {
@@ -133,7 +132,7 @@ public class SQLiteTable {
      * Update the values of the SQLite Table
      * @return - True on success, false on failure
      */
-    public boolean update() {
+    public boolean update(DatabaseEngine engine) {
        // StringBuilder columns = new StringBuilder();
         StringBuilder values = new StringBuilder();
         StringBuilder sql = new StringBuilder();
@@ -172,7 +171,7 @@ public class SQLiteTable {
             fields[0].setAccessible(true);
             sql.append(values.toString()).append(" WHERE ").append(fields[0].getName().toLowerCase()).append(" = '").append(FieldUtils.readField(fields[0], this)).append("'");
 
-            Connection connection = DatabaseEngine.getConnection();
+            Connection connection = engine.getConnection();
             final Statement statement = connection.createStatement();
 
             if (!statement.execute(sql.toString())) {
@@ -198,13 +197,13 @@ public class SQLiteTable {
      * @param <T> - Returns a list of your class filled with data
      * @return
      */
-    public <T extends SQLiteTable> List<T> fetchAll(String whereClause)  {
+    public <T extends SQLiteTable> List<T> fetchAll(DatabaseEngine engine, String whereClause)  {
 
         Field[] fields = this.getClass().getDeclaredFields();
         List<T> tables = new ArrayList<>();
 
         try {
-            Connection connection = DatabaseEngine.getConnection();
+            Connection connection = engine.getConnection();
             final Statement statement = connection.createStatement();
 
             String sql = "SELECT * FROM " + this.getClass().getSimpleName() + (!whereClause.isEmpty() ? " WHERE " + whereClause : "");
@@ -289,20 +288,20 @@ public class SQLiteTable {
      * @param <T>
      * @return
      */
-    public <T extends SQLiteTable> List<T> fetchAll() {
-       return this.fetchAll("");
+    public <T extends SQLiteTable> List<T> fetchAll(DatabaseEngine engine) {
+       return this.fetchAll(engine, "");
     }
 
     /***
      * Fetch a single row from the table filtered by a whereClause
      * @param whereClause - The data to search against. Example: id = 1 or name = John Doe
      */
-    public void fetch(String whereClause) {
+    public void fetch(DatabaseEngine engine, String whereClause) {
 
         Field[] fields = this.getClass().getDeclaredFields();
 
         try {
-            Connection connection = DatabaseEngine.getConnection();
+            Connection connection = engine.getConnection();
             final Statement statement = connection.createStatement();
 
             String sql = "SELECT * FROM " + this.getClass().getSimpleName() + " WHERE " + whereClause;
@@ -379,13 +378,13 @@ public class SQLiteTable {
      * Deletes the current row from the table
      * @return
      */
-    public boolean delete() {
+    public boolean delete(DatabaseEngine engine) {
         Field[] fields = this.getClass().getDeclaredFields();
         StringBuilder sql = new StringBuilder("DELETE FROM " + this.getClass().getSimpleName() + " WHERE id = ");
         boolean res = false;
 
         try {
-            Connection connection = DatabaseEngine.getConnection();
+            Connection connection = engine.getConnection();
             final Statement statement = connection.createStatement();
 
             for (Field field : fields) {
