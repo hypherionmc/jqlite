@@ -33,7 +33,7 @@ Then add the following to dependencies:
 
 ```gradle
 // Replace VERSION with one from above
-implementation 'me.hypherionmc:JQLite:VERSION'
+implementation 'me.hypherionmc.jqlite:JQLite:VERSION'
 ```
 No need for any other dependencies as they are included in the library.
 
