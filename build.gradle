@@ -5,8 +5,8 @@ plugins {
 }
 apply plugin: 'maven'
 
-group = 'me.hypherionmc'
-version = '1.0.4'
+group = 'me.hypherionmc.jqlite'
+version = '2.0.0-beta'
 archivesBaseName = "jqlite"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -15,14 +15,14 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    shade
+    implementation.extendsFrom(shade)
+}
+
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.30.1'
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
-
-    shadow group: 'org.xerial', name: 'sqlite-jdbc', version: '3.30.1'
-    shadow group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
-
+    shade group: 'org.xerial', name: 'sqlite-jdbc', version: '3.39.2.0'
+    shade group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 }
 
 configurations {
@@ -34,7 +34,6 @@ configurations {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            // add all the jars that should be included when publishing to maven
             artifact(shadowJar) {
                 builtBy shadowJar
             }
@@ -42,12 +41,9 @@ publishing {
         }
     }
 
-    // select the repositories you want to publish to
     repositories {
-        // uncomment to publish to the local maven
-        // mavenLocal()
         maven {
-            url project.mavenUrl
+            url project.mavenUrl + (project.version.toString().contains("-beta") ? "/snapshots" : "/releases")
             credentials {
                 username System.getenv('MAVEN_USER')
                 password System.getenv('MAVEN_PASS')
@@ -57,6 +53,7 @@ publishing {
 }
 
 shadowJar {
+    configurations = [project.configurations.shade]
     archiveBaseName.set('JQLite')
     archiveClassifier.set('')
     archiveVersion.set(project.version)
