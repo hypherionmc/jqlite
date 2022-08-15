@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface SQLCOLUMN {
+public @interface SQLColumn {
 
     public enum Type {
         PRIMARY,
@@ -31,9 +31,11 @@ public @interface SQLCOLUMN {
         NCHAR,
         NVARCHAR,
         TEXT,
-        CLOB
+        CLOB,
+        TIMESTAMP,
+        UPDATESTAMP
     }
 
-    Type type();
+    Type value();
     int maxSize() default 10;
 }

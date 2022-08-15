@@ -1,6 +1,8 @@
 package me.hypherionmc.jqlite;
 
 import me.hypherionmc.jqlite.data.SQLiteTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,19 +10,17 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public class DatabaseEngine {
+public class SQLiteDatabase {
 
-    public static final Logger LOGGER = Logger.getLogger("JQLite");
+    public static final Logger LOGGER = LoggerFactory.getLogger("JQLite");
     private final String DBCONNECTION;
 
     /***
      * Create a new JQLite instance
      * @param dbName - The name of your database (excluding .db)
      */
-    public DatabaseEngine(String dbName) {
+    public SQLiteDatabase(String dbName) {
         DBCONNECTION = "jdbc:sqlite:" + dbName +".db";
         try {
             final File dbFile = new File(dbName + ".db");
@@ -30,11 +30,11 @@ public class DatabaseEngine {
                     LOGGER.info("Created database file");
                     createNewDatabase();
                 } else {
-                    LOGGER.info("Could not create database file");
+                    LOGGER.error("Could not create database file");
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage());
+            LOGGER.error("Failed to create database {}", dbName, e);
         }
     }
 
@@ -47,7 +47,7 @@ public class DatabaseEngine {
                 conn.close();
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage());
+            LOGGER.error("Failed to create database", e);
         }
     }
 
@@ -59,7 +59,7 @@ public class DatabaseEngine {
         try {
             return DriverManager.getConnection(DBCONNECTION);
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage());
+            LOGGER.error("Could not retrieve database connection", e);
         }
         return null;
     }
@@ -73,8 +73,7 @@ public class DatabaseEngine {
             try {
                 table.create(this);
             } catch (Exception e) {
-                e.printStackTrace();
-                LOGGER.log(Level.SEVERE, "Failed to register table " + table.getClass().getName());
+                LOGGER.error("Failed to register table {}", table.getClass().getName(), e);
             }
         }
     }
