@@ -1,8 +1,8 @@
 package me.hypherionmc.jqlite.util;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author HypherionSA

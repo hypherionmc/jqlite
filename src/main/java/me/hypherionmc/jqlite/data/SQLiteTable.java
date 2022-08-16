@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class SQLiteTable {
@@ -95,6 +96,8 @@ public class SQLiteTable {
                         values.append("'").append(FieldUtils.readField(fields[i], this).toString().replaceAll("'", "''")).append("'");
                     } else if (fields[i].isAnnotationPresent(SQLColumn.class) && (fields[i].getAnnotation(SQLColumn.class).value() == SQLColumn.Type.TIMESTAMP || fields[i].getAnnotation(SQLColumn.class).value() == SQLColumn.Type.UPDATESTAMP)) {
                         values.append("'").append(DateUtils.getTimestamp()).append("'");
+                    } else if (fields[i].isAnnotationPresent(SQLColumn.class) && (fields[i].getAnnotation(SQLColumn.class).value() == SQLColumn.Type.DATE || fields[i].getAnnotation(SQLColumn.class).value() == SQLColumn.Type.DATETIME)) {
+                        values.append("'").append(DateUtils.formatTimeStamp((Date) FieldUtils.readField(fields[i], this))).append("'");
                     } else {
                         values.append("'").append(FieldUtils.readField(fields[i], this)).append("'");
                     }
