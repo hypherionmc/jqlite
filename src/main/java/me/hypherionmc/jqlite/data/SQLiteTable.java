@@ -156,6 +156,8 @@ public class SQLiteTable {
                         values.append(fields[i].getName().toLowerCase()).append(" = ").append("'").append(FieldUtils.readField(fields[i], this).toString().replaceAll("'", "''")).append("'");
                     } else if (fields[i].isAnnotationPresent(SQLColumn.class) && fields[i].getAnnotation(SQLColumn.class).value() == SQLColumn.Type.UPDATESTAMP) {
                         values.append(fields[i].getName().toLowerCase()).append(" = ").append("'").append(DateUtils.getTimestamp()).append("'");
+                    } else if (fields[i].isAnnotationPresent(SQLColumn.class) && (fields[i].getAnnotation(SQLColumn.class).value() == SQLColumn.Type.DATE || fields[i].getAnnotation(SQLColumn.class).value() == SQLColumn.Type.DATETIME || fields[i].getAnnotation(SQLColumn.class).value() == SQLColumn.Type.TIMESTAMP)) {
+                        values.append(fields[i].getName().toLowerCase()).append(" = ").append("'").append(DateUtils.formatTimeStamp((Date) FieldUtils.readField(fields[i], this))).append("'");
                     } else {
                         values.append(fields[i].getName().toLowerCase()).append(" = ").append("'").append(FieldUtils.readField(fields[i], this)).append("'");
                     }
