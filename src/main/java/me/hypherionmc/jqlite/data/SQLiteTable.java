@@ -12,6 +12,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class SQLiteTable {
 
@@ -410,5 +411,22 @@ public class SQLiteTable {
             results.forEach(r -> r.update(engine));
             return true;
         }
+    }
+
+    // Optional Wrappers
+
+    /**
+     * A wrapper around @link{fetch} that uses an Optional. This way you can determine if the query returned any data
+     * @param database - The SQLiteDatabase the table is registered to
+     * @param whereClause - Filter to apply to the query
+     * @return - Optional containing the SQLiteTable
+     * @param <T>
+     */
+    public <T extends SQLiteTable> Optional<T> fetchIfPresent(SQLiteDatabase database, String whereClause) {
+        if (!this.fetchAll(database, whereClause).isEmpty()) {
+            this.fetch(database, whereClause);
+            return (Optional<T>) Optional.of(this);
+        }
+        return Optional.empty();
     }
 }

@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'maven'
 
 group = 'me.hypherionmc.jqlite'
-version = '2.0.5-beta'
+version = '2.0.6-beta'
 archivesBaseName = "jqlite"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
